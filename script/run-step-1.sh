@@ -80,6 +80,16 @@ echo $OUTMSG
 echo 'Stage (Docker Build)'
 echo $OUTMSG
 pwd
-docker build -f ./jenkins-dockerfile/jenkins-master.dockerfile -t custom-jenkins:lts .
+docker build -f ./jenkins-dockerfile/JenkinsMaster.dockerfile -t custom-jenkins:lts .
 
+# Check if the previous command was successful
+if [ $? -ne 0 ]; then
+    # If the previous command was not successful, print an error message
+    echo "Error: Docker build failed."
+    # Exit the script with a non-zero status code
+    exit 1
+else
+    # If the previous command was successful, print a success message
+    echo "Docker build successful."
+fi
 
