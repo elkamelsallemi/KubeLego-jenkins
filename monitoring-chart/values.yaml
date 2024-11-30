@@ -1,0 +1,81 @@
+namespace: monitoring
+
+
+deployments:
+  - name: grafana
+    app: grafana
+    replicas: 1
+    image: grafana/grafana:latest
+    port: 3000
+    volumeMounts:
+      - name: grafana-datasource
+        mountPath: /etc/grafana/provisioning/datasources
+      - name: grafana-dashboards
+        mountPath: /etc/grafana/provisioning/dashboards
+    volumes:
+      - name: grafana-datasource
+        configMap:
+          name: grafana-datasource
+      - name: grafana-dashboards
+        emptyDir: {}
+
+  - name: prometheus
+    app: prometheus
+    replicas: 1
+    image: prom/prometheus:latest
+    port: 9090
+    volumeMounts:
+      - name: prometheus-config
+        mountPath: /etc/prometheus/prometheus.yml
+        subPath: prometheus.yml
+      - name: prometheus-data
+        mountPath: /prometheus
+    volumes:
+      - name: prometheus-config
+        configMap:
+          name: prometheus-config
+      - name: prometheus-data
+        persistentVolumeClaim:
+          claimName: prometheus-data-pvc
+
+
+
+services:
+  - name: grafana
+    app: grafana
+    type: ClusterIP
+    port: 3000
+    targetPort: 3000
+
+  - name: prometheus
+    app: prometheus
+    type: ClusterIP
+    port: 9090
+    targetPort: 9090
+
+pvc:
+  name: prometheus-data-pvc
+  accessModes: ReadWriteOnce
+  storageSize: 1Gi
+
+
+datasourceConfigs:
+  - name: grafana-datasource
+    prometheusYaml: |
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://prometheus:9090
+          access: proxy
+          isDefault: true
+
+  - name: prometheus-config
+    prometheusYaml: |
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://prometheus:9090
+          access: proxy
+          isDefault: true
