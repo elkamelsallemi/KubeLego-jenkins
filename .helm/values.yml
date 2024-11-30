@@ -1,0 +1,6 @@
+name : grafana
+namespace : monitoring
+replicas: 3
+image: grafana/grafana:latest
+port: 3000
+servicePort: 80
