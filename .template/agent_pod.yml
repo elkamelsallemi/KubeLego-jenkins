@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    some-label: kube-pod
+spec:
+  containers:
+  - name: pod-ubuntu-20
+    image: sallamielkamel/pod-ubuntu-20:latest
+    command:
+    - cat
+    tty: true
