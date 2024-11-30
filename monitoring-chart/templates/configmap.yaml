@@ -1,0 +1,11 @@
+{{- range .Values.datasourceConfigs }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.namespace }}
+data:
+  prometheus.yml: |
+{{ .prometheusYaml | indent 4 }}
+---
+{{- end }}
